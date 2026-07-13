@@ -1,0 +1,19 @@
+# furrow builds fine without cargo: vendor src/ and compile your site with
+# bare rustc. This manifest exists for rust-analyzer, `cargo test`, and
+# anyone who prefers a library dependency.
+[package]
+name = "furrow-ssg"
+version = "0.1.0"
+edition = "2024"
+description = "A static site generator in a handful of std-only Rust files. No crates, no templates, no JavaScript in the output."
+license = "GPL-3.0-only"
+repository = "https://github.com/carrot-wm/furrow"
+
+# zero dependencies, forever. the generator is part of the point.
+[dependencies]
+
+# the package publishes as furrow-ssg (crates.io's `furrow` was taken);
+# the library target keeps the real name, so code still says furrow::md
+[lib]
+name = "furrow"
+path = "src/lib.rs"
