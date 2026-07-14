@@ -36,6 +36,49 @@ pub fn fetch(slug: &str, fallback_stars: u64, fallback_desc: &str, ua: &str) -> 
     }
 }
 
+pub struct Asset {
+    pub name: String,
+    pub live: bool,
+}
+
+/// the newest release asset whose filename ends with `suffix` (say,
+/// "_amd64.deb"), read from /releases/latest; `fallback` is the last
+/// name you saw, for offline or rate-limited builds.
+pub fn latest_asset(slug: &str, suffix: &str, fallback: &str, ua: &str) -> Asset {
+    let url = format!("https://api.github.com/repos/{slug}/releases/latest");
+    let agent = format!("User-Agent: {ua}");
+    let out = Command::new("curl")
+        .args(["-sf", "--max-time", "5", "-H", &agent, &url])
+        .output();
+    if let Ok(out) = out {
+        if out.status.success() {
+            let body = String::from_utf8_lossy(&out.stdout);
+            if let Some(name) = asset_name(&body, suffix) {
+                return Asset { name, live: true };
+            }
+        }
+    }
+    Asset { name: fallback.to_string(), live: false }
+}
+
+/// scan every "browser_download_url" for a basename ending in `suffix`;
+/// download urls only exist on assets, so the release's own "name"
+/// field can never shadow them.
+fn asset_name(body: &str, suffix: &str) -> Option<String> {
+    let needle = "\"browser_download_url\":\"";
+    let mut rest = body;
+    while let Some(at) = rest.find(needle) {
+        rest = &rest[at + needle.len()..];
+        let end = rest.find('"')?;
+        let base = rest[..end].rsplit('/').next().unwrap_or("");
+        if base.ends_with(suffix) {
+            return Some(base.to_string());
+        }
+        rest = &rest[end..];
+    }
+    None
+}
+
 /// scan for `"key":<number>` at top level-ish. good enough for github's flat
 /// repo object; not a json parser and doesn't pretend to be.
 fn json_u64(body: &str, key: &str) -> Option<u64> {

@@ -3,7 +3,7 @@
 # anyone who prefers a library dependency.
 [package]
 name = "furrow-ssg"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "A static site generator in a handful of std-only Rust files. No crates, no templates, no JavaScript in the output."
 license = "GPL-3.0-only"

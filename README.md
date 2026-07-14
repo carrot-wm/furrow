@@ -33,7 +33,7 @@ rustc --edition 2024 -O demo/main.rs -o demo-site
 - `html` escapes text and wraps pages in a shell you define once (lang, og tags, and whatever head links your site self-hosts).
 - `out` writes pages under pretty routes (`docs/tiling` becomes `docs/tiling/index.html`) and copies static trees.
 - `serve` is a dev server in a page of std, with correct MIME types for resolved files.
-- `github` fetches star counts and descriptions at build time through a curl subprocess, with baked fallbacks for offline builds.
+- `github` fetches star counts, descriptions, and latest release asset names at build time through a curl subprocess, with baked fallbacks for offline builds.
 
 ## What it is not
 
